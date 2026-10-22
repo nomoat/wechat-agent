@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+.pytest_cache/
+web-data/
+web-outbox/
+electron/node_modules/
+electron/dist/
+electron/config.json
+*.log
+.env

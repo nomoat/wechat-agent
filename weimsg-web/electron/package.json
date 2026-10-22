@@ -1,0 +1,36 @@
+{
+  "name": "weimsg-pilot-desktop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "WeMsg Pilot desktop shell for the online web dashboard",
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.weimsg.pilot",
+    "productName": "WeMsg Pilot",
+    "files": [
+      "main.cjs",
+      "preload.cjs",
+      "offline.html",
+      "config.json"
+    ],
+    "mac": {
+      "target": ["dmg", "zip"],
+      "category": "public.app-category.social-networking",
+      "identity": null
+    },
+    "win": {
+      "target": ["nsis"]
+    },
+    "linux": {
+      "target": ["AppImage"]
+    }
+  }
+}

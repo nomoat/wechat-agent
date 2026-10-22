@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WeMsg Pilot · 微信消息看板</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2327a35a'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' fill='white' font-family='Arial'%3EW%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="app" id="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">W</div>
+        <div class="brand-text">
+          <strong>WeMsg Pilot</strong>
+          <span>微信消息实时看板</span>
+        </div>
+        <span id="status-dot" class="status-dot" title="连接状态"></span>
+      </div>
+      <div class="search-wrap">
+        <input id="search" type="search" placeholder="搜索会话" autocomplete="off">
+      </div>
+      <div id="conversation-list" class="conversation-list"></div>
+      <div class="sidebar-footer">
+        <span id="updated-at">等待数据…</span>
+        <span class="readonly-pill">可发送</span>
+      </div>
+    </aside>
+
+    <main class="chat">
+      <div class="chat-main">
+        <header class="chat-header">
+          <button id="back-button" class="back-button" aria-label="返回会话列表">‹</button>
+          <div class="chat-heading">
+            <div class="chat-title-row">
+              <div id="chat-avatar" class="avatar header-avatar"></div>
+              <div class="chat-title-text">
+                <h1 id="chat-title">选择一个会话</h1>
+                <p id="chat-subtitle">左侧是群聊和联系人，右侧显示实际消息</p>
+              </div>
+            </div>
+          </div>
+          <div class="chat-meta">
+            <button id="profile-toggle" class="icon-button" type="button" title="显示或隐藏会话资料">资料</button>
+            <span class="meta-pill">每 3 秒刷新</span>
+          </div>
+        </header>
+
+        <section id="message-list" class="message-list">
+          <div class="empty-state">
+            <div class="empty-icon">💬</div>
+            <p>从左侧选择一个群聊或联系人</p>
+            <small>消息来自本机 DuckDB 快照，页面每 3 秒刷新</small>
+          </div>
+        </section>
+
+        <button id="new-messages" class="new-messages hidden">有新消息 ↓</button>
+
+        <footer class="composer">
+          <div class="composer-box">
+            <input id="composer-input" type="text" maxlength="500" placeholder="输入消息…" disabled>
+            <div class="composer-actions">
+              <span id="composer-hint">发送前会定位并核对会话</span>
+              <button id="send-button" type="button" disabled>发送</button>
+            </div>
+          </div>
+        </footer>
+      </div>
+
+      <aside id="profile-panel" class="profile-panel">
+        <button id="profile-close" class="profile-close" type="button" aria-label="关闭资料">×</button>
+        <div id="profile-avatar" class="profile-avatar"></div>
+        <h2 id="profile-name">会话资料</h2>
+        <p id="profile-kind" class="profile-kind"></p>
+
+        <div class="profile-section">
+          <h3>备注</h3>
+          <p id="profile-remark"></p>
+        </div>
+        <div class="profile-section">
+          <h3>昵称</h3>
+          <p id="profile-nickname"></p>
+        </div>
+        <div class="profile-section" id="profile-alias-section">
+          <h3>微信号</h3>
+          <p id="profile-alias"></p>
+        </div>
+        <div class="profile-section">
+          <h3>标签</h3>
+          <div id="profile-tags" class="tag-list"></div>
+        </div>
+        <div class="profile-section">
+          <h3>备忘 / 描述</h3>
+          <p id="profile-description"></p>
+        </div>
+        <div class="profile-section" id="profile-announcement-section">
+          <h3>群公告</h3>
+          <div id="profile-announcement" class="announcement"></div>
+          <small id="profile-announcement-meta"></small>
+        </div>
+        <div id="profile-meta" class="profile-meta"></div>
+      </aside>
+    </main>
+  </div>
+
+  <div id="lightbox" class="lightbox hidden">
+    <button id="lightbox-close" aria-label="关闭图片">×</button>
+    <img id="lightbox-img" alt="图片预览">
+  </div>
+  <div id="video-modal" class="video-modal hidden" role="dialog" aria-modal="true" aria-label="视频播放">
+    <div class="video-modal-body">
+      <button id="video-close" class="video-modal-close" type="button" aria-label="关闭视频">×</button>
+      <video id="video-player" class="hidden" controls playsinline preload="metadata"></video>
+      <div id="video-missing" class="video-missing hidden">
+        <div class="video-missing-card">
+          <div class="video-missing-title">原视频尚未缓存到本地</div>
+          <div class="video-missing-hint">在微信中打开并播放这条视频后，这里会自动出现播放按钮。页面每 3 秒同步一次。</div>
+          <button id="video-retry" class="video-retry" type="button">重新检测</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="file-modal" class="file-modal hidden" role="dialog" aria-modal="true" aria-label="文件预览">
+    <div class="file-modal-body">
+      <button id="file-close" class="file-modal-close" type="button" aria-label="关闭文件预览">×</button>
+      <div id="file-modal-title" class="file-modal-title"></div>
+      <div id="file-modal-content" class="file-modal-content"></div>
+    </div>
+  </div>
+  <div id="toast" class="toast" role="status"></div>
+
+  <script src="/static/message-utils.js?v=20261022c"></script>
+  <script src="/static/app.js?v=20261022b"></script>
+</body>
+</html>

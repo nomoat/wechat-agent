@@ -1,0 +1,13 @@
+services:
+  web:
+    build: .
+    image: weimsg-web:local
+    ports:
+      - "${WEB_PORT:-8080}:8080"
+    environment:
+      WECHAT_FILES_ROOT: /wechat-files
+    volumes:
+      - ./web-data:/data:ro
+      - ./web-outbox:/outbox
+      - "${WECHAT_FILES_HOST_DIR:-${HOME}/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files}:/wechat-files:ro"
+    restart: unless-stopped

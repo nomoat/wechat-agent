@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+.pytest_cache/
+web-data/
+web-outbox/
+tests/
+electron/
+*.log
+.git/
